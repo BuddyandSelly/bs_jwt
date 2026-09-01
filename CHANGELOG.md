@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Specs for the railtie, the `bs_jwt:install` rake task, the factory defaults and the
   error paths of the JWKS lookup. SimpleCov measures the suite and fails it when line or
   branch coverage of `lib/` drops below 100%.
+- CI comments the line and branch coverage on every pull request and uploads the HTML
+  coverage report as a build artifact.
 
 ### Changed
 - The gem is developed and tested with Ruby 4.0.6, `required_ruby_version` is `>= 3.2`.

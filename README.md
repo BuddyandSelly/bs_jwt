@@ -70,7 +70,8 @@ The gem is developed and tested against the Ruby version in
 
 The specs are measured with [SimpleCov](https://github.com/simplecov-ruby/simplecov).
 Line and branch coverage of everything in `lib/` have to stay at 100%, the suite fails
-otherwise. The HTML report is written to `coverage/index.html`.
+otherwise. The HTML report is written to `coverage/index.html`, and CI comments both
+percentages on every pull request.
 
 ## Publish new gem version
 

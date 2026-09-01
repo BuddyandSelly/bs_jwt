@@ -2,6 +2,21 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 ## Unreleased
+### Added
+- Specs for the railtie, the `bs_jwt:install` rake task, the factory defaults and the
+  error paths of the JWKS lookup. SimpleCov measures the suite and fails it when line or
+  branch coverage of `lib/` drops below 100%.
+- CI comments the line and branch coverage on every pull request and uploads the HTML
+  coverage report as a build artifact.
+
+### Changed
+- The gem is developed and tested with Ruby 4.0.6, `required_ruby_version` is `>= 3.2`.
+- Updated the dependencies: `activesupport >= 7.0`, `faraday >= 2.0` (the `<= 2.0` upper
+  bound is gone), `json-jwt >= 1.17`, and the development dependencies to their current
+  versions (bundler 2.4+, factory_bot 6, pry-byebug 3.12, rake 13, rspec 3.13,
+  rubocop 1.90, simplecov 1.1, webmock 3.26).
+- The `bs_jwt:install` rake task writes to `$stdout` instead of `STDOUT`.
+
 ## [2.0.1] - 2018-07-23
 No changes. Version 2.0.0 was accidentally deleted from ruby gems.
 

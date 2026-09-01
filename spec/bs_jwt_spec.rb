@@ -51,20 +51,10 @@ RSpec.describe BsJwt do
     end
   end
 
-  def set_auth0_domain_stub_keyset
-    described_class.auth0_domain = 'reverse-retail.eu.auth0.com'
-    stub_request(:get, 'https://reverse-retail.eu.auth0.com/.well-known/jwks.json')
-      .to_return(status: 200, body: load_fixture('jwks.json'))
-  end
-
-  def load_fixture(name)
-    File.read("./spec/fixtures/#{name}")
-  end
-
   describe '#verify_and_decode' do
     context 'called with a valid JWT' do
       it 'returns an Authentication object with the right attributes' do
-        set_auth0_domain_stub_keyset
+        stub_auth0_jwks
         jwt = load_fixture('valid_jwt')
 
         actual = described_class.verify_and_decode(jwt)
@@ -82,13 +72,13 @@ RSpec.describe BsJwt do
     end
 
     it 'returns nil for JWT with invalid signature' do
-      set_auth0_domain_stub_keyset
+      stub_auth0_jwks
       jwt = load_fixture('jwt_with_invalid_signature')
       expect(described_class.verify_and_decode(jwt)).to be_nil
     end
 
     it 'returns nil for JWT signed by wrong authority' do
-      set_auth0_domain_stub_keyset
+      stub_auth0_jwks
       jwt = load_fixture('jwt_signed_by_wrong_authority')
       expect(described_class.verify_and_decode(jwt)).to be_nil
     end
@@ -101,7 +91,7 @@ RSpec.describe BsJwt do
   describe '#verify_and_decode!' do
     context 'called with a valid JWT' do
       it 'returns an Authentication object with the right attributes' do
-        set_auth0_domain_stub_keyset
+        stub_auth0_jwks
         jwt = load_fixture('valid_jwt')
 
         actual = described_class.verify_and_decode!(jwt)
@@ -118,14 +108,14 @@ RSpec.describe BsJwt do
     end
 
     it 'raises an InvalidToken error for JWT with invalid signature' do
-      set_auth0_domain_stub_keyset
+      stub_auth0_jwks
       jwt = load_fixture('jwt_with_invalid_signature')
 
       expect { described_class.verify_and_decode!(jwt) }.to raise_exception(BsJwt::InvalidToken)
     end
 
     it 'raises an InvalidToken error for JWT signed by wrong authority' do
-      set_auth0_domain_stub_keyset
+      stub_auth0_jwks
       jwt = load_fixture('jwt_signed_by_wrong_authority')
 
       expect { described_class.verify_and_decode!(jwt) }.to raise_exception(BsJwt::InvalidToken)
@@ -133,6 +123,74 @@ RSpec.describe BsJwt do
 
     it 'raises an InvalidToken error when called with nil' do
       expect { described_class.verify_and_decode!(nil) }.to raise_exception(BsJwt::InvalidToken)
+    end
+  end
+
+  describe '#jwks_key' do
+    it 'fetches the key set from the configured Auth0 domain' do
+      request = stub_auth0_jwks
+
+      expect(described_class.jwks_key).to be_a(JSON::JWK::Set)
+      expect(request).to have_been_requested
+    end
+
+    it 'fetches the key set only once' do
+      request = stub_auth0_jwks
+
+      2.times { described_class.jwks_key }
+
+      expect(request).to have_been_requested.once
+    end
+
+    context 'called with a domain that already contains a scheme' do
+      it 'does not prepend https for an https domain' do
+        request = stub_auth0_jwks(domain: "https://#{JwksHelpers::AUTH0_DOMAIN}")
+
+        described_class.jwks_key
+
+        expect(request).to have_been_requested
+      end
+
+      it 'does not prepend https for an http domain' do
+        domain = "http://#{JwksHelpers::AUTH0_DOMAIN}"
+        request = stub_auth0_jwks(domain: domain, url: "#{domain}#{BsJwt::DEFAULT_ENDPOINT}")
+
+        described_class.jwks_key
+
+        expect(request).to have_been_requested
+      end
+    end
+
+    context 'called without a configured auth0_domain' do
+      it 'raises a ConfigMissing error when it is nil' do
+        described_class.auth0_domain = nil
+
+        expect { described_class.jwks_key }
+          .to raise_exception(BsJwt::ConfigMissing, 'auth0_domain is not set')
+      end
+
+      it 'raises a ConfigMissing error when it is empty' do
+        described_class.auth0_domain = ''
+
+        expect { described_class.jwks_key }
+          .to raise_exception(BsJwt::ConfigMissing, 'auth0_domain is not set')
+      end
+
+      it 'raises a ConfigMissing error when it cannot be checked for emptiness' do
+        described_class.auth0_domain = 42
+
+        expect { described_class.jwks_key }
+          .to raise_exception(BsJwt::ConfigMissing, 'auth0_domain is not set')
+      end
+    end
+
+    context 'called when the JWKS endpoint does not answer successfully' do
+      it 'raises a NetworkError' do
+        stub_auth0_jwks(status: 500, body: 'Internal Server Error')
+
+        expect { described_class.jwks_key }
+          .to raise_exception(BsJwt::NetworkError, 'Fetching JWKS key failed')
+      end
     end
   end
 end

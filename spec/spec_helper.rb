@@ -8,9 +8,9 @@ SimpleCov.start do
   primary_coverage :branch
 
   # Everything the gem ships has to be covered, whether it was loaded or not.
-  track_files '{lib}/**/*.{rb,rake}'
+  cover '{lib}/**/*.{rb,rake}'
   # Loaded by the gemspec, and therefore by bundler, before coverage starts.
-  add_filter 'lib/bs_jwt/version.rb'
+  skip 'lib/bs_jwt/version.rb'
 
   minimum_coverage line: 100, branch: 100
 end

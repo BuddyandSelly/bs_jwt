@@ -58,6 +58,20 @@ require 'bs_jwt/factories'
 
 before requiring `factory_bot` to your spec_helper.
 
+## Development
+
+The gem is developed and tested against the Ruby version in
+[.ruby-version](.ruby-version) and supports Ruby >= 3.2.
+
+    $ bundle install
+    $ bundle exec rspec     # specs, including the coverage check
+    $ bundle exec rubocop   # style
+    $ bundle exec rake      # both of the above
+
+The specs are measured with [SimpleCov](https://github.com/simplecov-ruby/simplecov).
+Line and branch coverage of everything in `lib/` have to stay at 100%, the suite fails
+otherwise. The HTML report is written to `coverage/index.html`.
+
 ## Publish new gem version
 
 1) Set the new version in the [version file](lib/bs_jwt/version.rb).

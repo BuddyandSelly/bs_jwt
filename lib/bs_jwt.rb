@@ -2,11 +2,10 @@
 
 require 'bs_jwt/version'
 require 'bs_jwt/authentication'
-# Only reachable from inside a Rails application, and a file is loaded once
-# per process - the railtie itself is covered by spec/bs_jwt/railtie_spec.rb.
-# :nocov:
+# simplecov:disable branch - a file is loaded once per process, so only one arm
+# of this condition can be taken. See spec/bs_jwt/railtie_spec.rb.
 require 'bs_jwt/railtie' if defined?(Rails)
-# :nocov:
+# simplecov:enable branch
 require 'json/jwt'
 require 'faraday'
 require 'active_support/core_ext'
@@ -80,7 +79,7 @@ module BsJwt
     def check_config
       %i[auth0_domain].each do |key|
         val = send(key)
-        next if val && (val.respond_to?(:empty?) && !val.empty?) # present
+        next if val.respond_to?(:empty?) && !val.empty? # present
 
         raise ConfigMissing, "#{key} is not set"
       end
@@ -88,7 +87,7 @@ module BsJwt
 
     def fetch_jwks(domain: auth0_domain)
       url = [domain, DEFAULT_ENDPOINT].join
-      url = 'https://' + url unless url =~ %r{https?://}
+      url = "https://#{url}" unless url =~ %r{https?://}
       res = Faraday.get(url)
       # raise if response code is not HTTP success
       # Faraday's exception should fall through

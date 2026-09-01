@@ -27,7 +27,7 @@ module BsJwt
       @issued_at = attributes[:issued_at]
     end
 
-    def has_role?(role) # rubocop:disable Naming/PredicateName
+    def has_role?(role) # rubocop:disable Naming/PredicatePrefix
       roles.include?(role)
     end
 

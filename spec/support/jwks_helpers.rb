@@ -5,7 +5,7 @@
 # with.
 module JwksHelpers
   AUTH0_DOMAIN = 'reverse-retail.eu.auth0.com'
-  JWKS_URL = "https://#{AUTH0_DOMAIN}/.well-known/jwks.json"
+  JWKS_URL = "https://#{AUTH0_DOMAIN}/.well-known/jwks.json".freeze
 
   def load_fixture(name)
     File.read(File.join(__dir__, '..', 'fixtures', name))

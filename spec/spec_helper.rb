@@ -7,8 +7,10 @@ SimpleCov.start do
   enable_coverage :branch
   primary_coverage :branch
 
-  add_filter '/spec/'
+  # Everything the gem ships has to be covered, whether it was loaded or not.
   track_files '{lib}/**/*.{rb,rake}'
+  # Loaded by the gemspec, and therefore by bundler, before coverage starts.
+  add_filter 'lib/bs_jwt/version.rb'
 
   minimum_coverage line: 100, branch: 100
 end
@@ -21,7 +23,7 @@ require 'rspec'
 require 'factory_bot'
 require 'bs_jwt/factories'
 
-Dir[File.join(__dir__, 'support', '**', '*.rb')].sort.each { |file| require file }
+Dir[File.join(__dir__, 'support', '**', '*.rb')].each { |file| require file }
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

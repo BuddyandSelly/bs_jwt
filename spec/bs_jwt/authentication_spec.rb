@@ -4,11 +4,11 @@ module BsJwt
   RSpec.describe Authentication do
     describe '.new' do
       it 'works with an attributes hash with string keys' do
-        attributes = { 'user_id': '123', 'email': 'test@test.de' }
+        attributes = { 'user_id' => '123', 'email' => 'test@test.de' }
 
         authentication = Authentication.new(attributes)
 
-        expect(authentication).to have_attributes(attributes)
+        expect(authentication).to have_attributes(user_id: '123', email: 'test@test.de')
       end
 
       it 'works with an attributes hash with symbol keys' do

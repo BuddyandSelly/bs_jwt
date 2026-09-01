@@ -1,12 +1,21 @@
 # This is the configuration used to check the rubocop source code.
 
 AllCops:
-  TargetRubyVersion: 2.5
+  TargetRubyVersion: 3.2
+  NewCops: enable
   Exclude:
     - 'vendor/**/*'
     - 'spec/fixtures/**/*'
 
-Lint/HandleExceptions:
+# Development dependencies are declared in the gemspec, next to the runtime ones.
+Gemspec/DevelopmentDependencies:
+  EnforcedStyle: gemspec
+
+# The gem is not published to rubygems.org, see the gemspec.
+Gemspec/RequireMFA:
+  Enabled: false
+
+Lint/SuppressedException:
   Exclude:
     - 'bin/rails'
     - 'bin/rake'
@@ -25,7 +34,7 @@ Style/RescueModifier:
 Naming/FileName:
   Enabled: false
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 120
 
 Style/RescueStandardError:

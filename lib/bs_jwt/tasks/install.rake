@@ -8,9 +8,9 @@ namespace :bs_jwt do
     source = File.join(Gem.loaded_specs['bs_jwt'].full_gem_path, 'config', 'initializers', 'bs_jwt.rb')
     target = File.join(Rails.root, 'config', 'initializers', 'bs_jwt.rb')
     if File.exist?(target)
-      STDOUT.puts "File #{target} exists, overwriting..."
+      $stdout.puts "File #{target} exists, overwriting..."
     else
-      STDOUT.puts "Generating new initializer at #{target}..."
+      $stdout.puts "Generating new initializer at #{target}..."
     end
     FileUtils.cp(source, target)
   end

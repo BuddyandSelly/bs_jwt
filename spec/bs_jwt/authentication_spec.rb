@@ -18,6 +18,61 @@ module BsJwt
 
         expect(authentication).to have_attributes(attributes)
       end
+
+      it 'works without any attributes' do
+        authentication = Authentication.new
+
+        expect(authentication).to have_attributes(
+          roles: [],
+          display_name: nil,
+          token: nil,
+          expires_at: nil,
+          email: nil,
+          user_id: nil,
+          issued_at: nil
+        )
+      end
+
+      it 'keeps the given roles' do
+        authentication = Authentication.new(roles: %w[admin])
+
+        expect(authentication.roles).to eq(%w[admin])
+      end
+    end
+
+    describe '.from_jwt_payload' do
+      let(:payload) do
+        {
+          'https://buddy.buddyandselly.com/roles' => %w[admin],
+          'nickname' => 'Jannik Graw',
+          'name' => 'j.graw@buddyandselly.com',
+          'sub' => 'auth0|4e3a2fef71b571961c1b229',
+          'iat' => 1529658629,
+          'exp' => 1529694629
+        }
+      end
+
+      it 'maps the JWT payload onto the attributes' do
+        authentication = described_class.from_jwt_payload(payload, 'the.jwt.token')
+
+        expect(authentication).to have_attributes(
+          roles: %w[admin],
+          display_name: 'Jannik Graw',
+          token: 'the.jwt.token',
+          expires_at: Time.at(1529694629),
+          email: 'j.graw@buddyandselly.com',
+          user_id: 'auth0|4e3a2fef71b571961c1b229',
+          issued_at: Time.at(1529658629)
+        )
+      end
+
+      it 'defaults the roles to an empty array when the claim is missing' do
+        authentication = described_class.from_jwt_payload(
+          payload.except('https://buddy.buddyandselly.com/roles'), 'the.jwt.token'
+        )
+
+        expect(authentication.roles).to eq([])
+      end
     end
 
     describe '#has_role?' do

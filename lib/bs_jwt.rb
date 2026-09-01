@@ -2,7 +2,11 @@
 
 require 'bs_jwt/version'
 require 'bs_jwt/authentication'
+# Only reachable from inside a Rails application, and a file is loaded once
+# per process - the railtie itself is covered by spec/bs_jwt/railtie_spec.rb.
+# :nocov:
 require 'bs_jwt/railtie' if defined?(Rails)
+# :nocov:
 require 'json/jwt'
 require 'faraday'
 require 'active_support/core_ext'

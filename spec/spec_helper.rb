@@ -1,6 +1,18 @@
 # frozen_string_literal: true
 
 require 'bundler/setup'
+require 'simplecov'
+
+SimpleCov.start do
+  enable_coverage :branch
+  primary_coverage :branch
+
+  add_filter '/spec/'
+  track_files '{lib}/**/*.{rb,rake}'
+
+  minimum_coverage line: 100, branch: 100
+end
+
 require 'bs_jwt'
 require 'faraday'
 require 'byebug'
@@ -8,6 +20,8 @@ require 'webmock/rspec'
 require 'rspec'
 require 'factory_bot'
 require 'bs_jwt/factories'
+
+Dir[File.join(__dir__, 'support', '**', '*.rb')].sort.each { |file| require file }
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -28,8 +42,18 @@ RSpec.configure do |config|
   config.order = :random
 
   config.include FactoryBot::Syntax::Methods
+  config.include JwksHelpers
+  config.include RakeHelpers
 
   config.before(:suite) do
     FactoryBot.find_definitions
+  end
+
+  # `BsJwt` keeps global configuration and memoizes the fetched JWKS, so every
+  # example has to start from the state the suite was loaded with.
+  config.around do |example|
+    BsJwtState.reset!
+    example.run
+    BsJwtState.reset!
   end
 end

@@ -82,6 +82,8 @@ jobs:
         with:
           script: |
             const marker = '<!-- simplecov-coverage-report -->';
+            // context.sha is the ephemeral merge commit on pull_request events.
+            const headSha = context.payload.pull_request.head.sha;
             const body = [
               marker,
               '## Coverage',
@@ -91,7 +93,7 @@ jobs:
               `| Line | ${process.env.LINE}% |`,
               `| Branch | ${process.env.BRANCH}% |`,
               '',
-              `Measured by SimpleCov on \`${context.sha.substring(0, 7)}\`. `
+              `Measured by SimpleCov on \`${headSha.substring(0, 7)}\`. `
                 + 'The full HTML report is attached to this run as the '
                 + '`coverage-report` artifact.'
             ].join('\n');
